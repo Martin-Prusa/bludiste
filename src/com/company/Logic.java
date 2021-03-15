@@ -6,16 +6,9 @@ public class Logic {
     public static char[][] reseni(int level) {
         char[][] maze = Data.prectiLevel(level);
 
-        /*maze = new char[][]{
-                {' ', '#', '#'},
-                {' ', ' ', ' '},
-                {'#', '#', ' '},
-                {'#', '#', ' '}
-        };*/
-
-
         ArrayList<Coordinate> cesta = new ArrayList<>();
         ArrayList<Coordinate> nejkratsi = new ArrayList<>();
+        ArrayList<Coordinate> navstivene = new ArrayList<>();
 
         //---Start-------
         Coordinate start = new Coordinate();
@@ -24,17 +17,15 @@ public class Logic {
 
         //------Konec--------
         Coordinate end = new Coordinate();
-        end.x = maze[0].length-1;
+        end.x = maze[0].length - 1;
         end.y = maze.length - 1;
 
-
-
-        if(cesta(maze, start, end, cesta, nejkratsi)) {
-
-            for (Coordinate coordinate : nejkratsi) {
-                maze[coordinate.y][coordinate.x] = 'x';
-            }
+        cesta(maze, start, end, cesta, nejkratsi, navstivene);
+        for (Coordinate coordinate : nejkratsi) {
+            maze[coordinate.y][coordinate.x] = 'x';
         }
+
+
         return maze;
     }
 
@@ -49,37 +40,47 @@ public class Logic {
         return coord;
     }
 
-    public static boolean chybneMisto(int x, int y, char[][] maze) {
+    public static boolean chybneMisto(int x, int y, char[][] maze, ArrayList<Coordinate> navstivene) {
         Coordinate coord = new Coordinate();
         coord.x = x;
         coord.y = y;
-        if(0 <= x && 0 <= y && maze[0].length > x && maze.length > y && maze[y][x] == ' ') return false;
+        if (0 <= x && 0 <= y && maze[0].length > x && maze.length > y && maze[y][x] == ' ' && !jeNavstivene(navstivene, x, y))
+            return false;
         return true;
     }
 
-    public static boolean cesta(char[][] maze, Coordinate coords, Coordinate end, ArrayList<Coordinate> cesta, ArrayList<Coordinate> nejkratsi) {
+    public static boolean jeNavstivene(ArrayList<Coordinate> navstivene, int x, int y) {
+        for (Coordinate coordinate : navstivene) {
+            if (coordinate.x == x && coordinate.y == y) return true;
+        }
+        return false;
+    }
 
-        if(chybneMisto(coords.x, coords.y, maze)) return false;
+    public static boolean cesta(char[][] maze, Coordinate coords, Coordinate end, ArrayList<Coordinate> cesta, ArrayList<Coordinate> nejkratsi, ArrayList<Coordinate> navstivene) {
 
+        if (chybneMisto(coords.x, coords.y, maze, navstivene)) return false;
+
+        navstivene.add(coords);
         cesta.add(coords);
 
-        if(jeNaKonci(end, coords)) {
-            if(nejkratsi.isEmpty() || nejkratsi.size() > cesta.size()) {
-                nejkratsi = new ArrayList<>(cesta);
+        if (jeNaKonci(end, coords)) {
+            if (nejkratsi.isEmpty() || nejkratsi.size() > cesta.size()) {
+                nejkratsi.clear();
+                nejkratsi.addAll(cesta);
             }
             return false;
         }
 
         Coordinate misto = dalsiPozice(coords.x, coords.y, 0, 1);
-        if(cesta(maze, misto, end, cesta, nejkratsi)) return true;
+        if (cesta(maze, misto, end, cesta, nejkratsi, navstivene)) return true;
         misto = dalsiPozice(coords.x, coords.y, 1, 0);
-        if(cesta(maze, misto, end, cesta, nejkratsi)) return true;
+        if (cesta(maze, misto, end, cesta, nejkratsi, navstivene)) return true;
         misto = dalsiPozice(coords.x, coords.y, -1, 0);
-        if(cesta(maze, misto, end, cesta, nejkratsi)) return true;
+        if (cesta(maze, misto, end, cesta, nejkratsi, navstivene)) return true;
         misto = dalsiPozice(coords.x, coords.y, 0, -1);
-        if(cesta(maze, misto, end, cesta, nejkratsi)) return true;
+        if (cesta(maze, misto, end, cesta, nejkratsi, navstivene)) return true;
 
-        cesta.remove(cesta.size()-1);
+        cesta.remove(cesta.size() - 1);
         return false;
     }
 }
