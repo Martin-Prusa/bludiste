@@ -6,9 +6,7 @@ public class Gui {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static void vyresLevel() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Zadej číslo levelu k vyřešení: ");
-        char[][] maze = Logic.reseni(Integer.parseInt(sc.nextLine()));
+        char[][] maze = Logic.reseni();
         vypisLevel(maze);
     }
 
